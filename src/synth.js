@@ -1,26 +1,47 @@
 
-/// standard sampling rate
-/// See: http://en.wikipedia.org/wiki/44,100_Hz
+/* ************************************************************* */
+/* General constants                                             */
+/* ************************************************************* */
+
+/**
+ * standard sampling rate
+ * See: http://en.wikipedia.org/wiki/44,100_Hz
+ */
 const SampleRate = 44100;
 
 
-/// "Standard Pitch" noted as A440. The a note that is above middle c
-/// See: http://en.wikipedia.org/wiki/A440_(pitch_standard)
+/**
+ * "Standard Pitch" noted as A440. The a note that is above middle c
+ * See: http://en.wikipedia.org/wiki/A440_(pitch_standard)
+ */
 const A440 = 440;
 
 
-/// The ratio require to move from one semi-tone to the next
-/// See: http://en.wikipedia.org/wiki/Semitone
+/**
+ * The ratio require to move from one semi-tone to the next
+ * See: http://en.wikipedia.org/wiki/Semitone
+ */
 const semitone = Math.pow(2, 1 / 12);
 
-/// Since our Note enum is relative to c, we need to find middle c.
-/// We know A440 = 440 hz and that the next c is three semi tones
-/// above that, but this is c one ocative above middle c, so we
-/// half the result to get middle c.
-/// Middle c is around 261.626 Hz, and this approximately the value we get
-/// See: http://en.wikipedia.org/wiki/C_(musical_note)
+/**
+ * Since our Note enum is relative to c, we need to find middle c.
+ * We know A440 = 440 hz and that the next c is three semi tones
+ * above that, but this is c one ocative above middle c, so we
+ * half the result to get middle c.
+ * Middle c is around 261.626 Hz, and this approximately the value we get
+ * See: http://en.wikipedia.org/wiki/C_(musical_note)
+ */
 const middleC = (A440 * Math.pow(semitone, 3)) / 2;
 
+/**
+ * beats per minute
+ */
+const bpm = 90.
+
+
+/* ************************************************************* */
+/* Note constants                                                */
+/* ************************************************************* */
 
 const  C         = 0
 const  Csharp    = 1
@@ -43,6 +64,22 @@ const  Bflat     = 10
 const  B         = 11
 const  Bsharp    = 12
 
+/* ************************************************************* */
+/* Note length constants                                         */
+/* ************************************************************* */
+
+const longa = 4;
+const breve = 2;
+const semibreve = 1;
+const minim = 1 / 2;
+const crotchet = 1 / 4;
+const quaver = 1 / 8;
+const semiquaver = 1 / 16;
+const demisemiquaver = 1 / 32;
+
+/* ************************************************************* */
+/* functions for creating notes                                  */
+/* ************************************************************* */
 
 /**
  * Converts from our note enum to the notes frequency
@@ -69,15 +106,6 @@ function samplesPerBar(bmp) {
     return (SampleRate * beatsPerSecond(bmp)) * beatsPerSemibreve;
 }
 
-
-const longa = 4;
-const breve = 2;
-const semibreve = 1;
-const minim = 1 / 2;
-const crotchet = 1 / 4;
-const quaver = 1 / 8;
-const semiquaver = 1 / 16;
-const demisemiquaver = 1 / 32;
 
 /**
  * caculates a note's length in samples
@@ -113,6 +141,10 @@ function makeNote(waveFunc, length, note, octave) {
     return Array.from(makeWave(waveFunc, length, frequency));
 }
 
+/* ************************************************************* */
+/* functions for shaping notes                                   */
+/* ************************************************************* */
+
 /**
  * function for making a sine wave
  */
@@ -144,11 +176,67 @@ function triangle(phaseAngle) {
     }
 }
 
+/**
+ * function for making right angle triangular waves
+ */
 function sawtooth(phaseAngle) {
     return -1 + phaseAngle;
 }
 
-const WaveFormat_channels = 1;
+/* ************************************************************* */
+/* functions for transforming notes                              */
+/* ************************************************************* */
+
+/**
+ * Combines several notes into a chord
+ */
+function Transformation_combine(its) {
+    const zip = (arr) => {
+        const length = Math.max(...arr.map(a => a.length));
+        return Array(length).fill().map((_,i) => arr.map(a => a[i]))
+    };
+    const arr = its.map(x => Array.from(x));
+    const zipped = zip(arr);
+    console.log(zipped.length);
+    const combined = zipped.map(x => {
+            var sum = 0;
+            for(const y of x) {
+                sum += y;
+            } 
+            return sum;
+    }); 
+    return combined;
+  };
+
+/**
+ * makes the waves amplitude large or small by scaling by the given multiplier
+ */
+function Transformation_scaleHeight(multiplier, waveDef) {
+    return waveDef.map((x) => (x * multiplier));
+}
+
+/**
+ * flattens the wave at the given limit to give an overdrive effect
+ */
+function Transformation_flatten(limit, waveDef) {
+    return waveDef.map((x) => Math.max(-limit, Math.min(x, limit)));
+}
+
+/**
+ * provides a way to linearly tapper a wave, the startMultiplier is
+ * applied to the first value of the a wave, and endMultiplier is
+ * applied to the last value, the other values have value that is linearly
+ * interpolated between the two values
+ */
+function Transformation_tapper(startMultiplier, endMultiplier, waveDef) {
+    const waveVector = Array.from(waveDef);
+    const step = (endMultiplier - startMultiplier) / waveVector.length;
+    return waveVector.map((x, i) => (x * (startMultiplier + (step * i))));
+}
+
+/* ************************************************************* */
+/* functions outputing a wave in the WAV format                  */
+/* ************************************************************* */
 
 function WaveFormat_bytesOfInt16(i) {
     return [0, 8].map((shift) => {
@@ -163,6 +251,17 @@ function WaveFormat_bytesOfInt(i) {
         return value & 0xFF;
     });
 }
+
+function arrayBufferToBase64( buffer ) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+}
+
 
 function WaveFormat_wavOfBuffer(buffer) {
     const sixteenBitLength = (2 * buffer.length) | 0;
@@ -189,6 +288,9 @@ function WaveFormat_wavOfBuffer(buffer) {
     return outBuffer;
 }
 
+/* ************************************************************* */
+/* Display the WAV as a graph on a canvas                        */
+/* ************************************************************* */
 
 function Svg_displayWave(points) {
     const Svg_svg = document.getElementById("svg");
@@ -200,10 +302,14 @@ function Svg_displayWave(points) {
     const midPoint = Svg_svg.clientHeight / 2;
     const maxLine = midPoint - margin;
     const chunkSize = ~~(points.length / length) | 0;
+    console.log("chunkSize" + chunkSize);
     var samples = [];
     for (let i = 0; i < points.length; i += chunkSize) {
         const chunk = points.slice(i, i + chunkSize);
-        samples.push(chunk.map(x => Math.abs(x)).reduce((a, b) => a + b) / chunk.length)
+        console.log(chunk);
+        const chunkSum = chunk.map(x => Math.abs(x)).reduce((a, b) => a + b);
+        console.log(chunkSum);
+        samples.push(chunkSum / chunk.length)
     }
 
     const svgns = "http://www.w3.org/2000/svg";
@@ -223,51 +329,57 @@ function Svg_displayWave(points) {
     }
 }
 
-const bpm = 90.
+/* ************************************************************* */
+/* Finally put it all together to make music!                    */
+/* ************************************************************* */
 
-function arrayBufferToBase64( buffer ) {
-    var binary = '';
-    var bytes = new Uint8Array( buffer );
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-        binary += String.fromCharCode( bytes[ i ] );
-    }
-    return window.btoa( binary );
-}
 
+const cord =
+    Transformation_flatten(0.9,
+        Transformation_combine([ 
+                Transformation_scaleHeight(0.3, makeNote(sine, noteValue(bpm, crotchet), C, 4)),
+                Transformation_scaleHeight(0.3, makeNote(square, noteValue(bpm, crotchet), G, 4)),
+                Transformation_scaleHeight(0.3, makeNote(sawtooth, noteValue(bpm, crotchet), A, 4)),
+                ]));
 
 const tune = 
-    [ makeNote(sine, noteValue(bpm, crotchet), C, 4),
-    makeNote(sine, noteValue(bpm, crotchet), C, 4),
-    makeNote(sine, noteValue(bpm, crotchet), G, 4),
-    makeNote(sine, noteValue(bpm, crotchet), G, 4),
-    makeNote(sine, noteValue(bpm, crotchet), A, 4),
-    makeNote(sine, noteValue(bpm, crotchet), A, 4),
-    makeNote(sine, noteValue(bpm, quaver), A, 4),
-    makeNote(sine, noteValue(bpm, quaver), A, 4),
-    makeNote(sine, noteValue(bpm, crotchet), G, 4),
-    //F F E E D D C
-    //Yes sir yes sir three bags full.
-    makeNote(sine, noteValue(bpm, crotchet), F, 4),
-    makeNote(sine, noteValue(bpm, crotchet), F, 4),
-    makeNote(sine, noteValue(bpm, crotchet), E, 4),
-    makeNote(sine, noteValue(bpm, crotchet), E, 4),
-    makeNote(sine, noteValue(bpm, crotchet), D, 4),
-    makeNote(sine, noteValue(bpm, crotchet), D, 4),
-    makeNote(sine, noteValue(bpm, crotchet), C, 4) ]
-    .flat();
+    [ 
+        //C C G G A A AA G
+        //Baa baa black sheep have you any wool?
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), C, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), C, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), G, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), G, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), A, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), A, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, quaver), A, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, quaver), A, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), G, 4)),
+        //F F E E D D C
+        //Yes sir yes sir three bags full.
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), F, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), F, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), E, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), E, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), D, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), D, 4)),
+        Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), C, 4)) 
+    ].flat();
 
-window.addEventListener('load', function () {
-
-    // const note = makeNote(sine, noteValue(bpm, crotchet), 0, 4);
-
-    var noteArr = Array.from(tune);
-    const wav = WaveFormat_wavOfBuffer(noteArr);
+function showAndPlay(input) {
+    var inputArr = Array.from(input);
+    const wav = WaveFormat_wavOfBuffer(inputArr);
     const wavBase64 = arrayBufferToBase64(wav);
 
     const Html_audio = document.getElementsByTagName("audio")[0];
 
     Html_audio.src = ("data:audio/wav;base64," + wavBase64);
 
-    Svg_displayWave(noteArr);
+    Svg_displayWave(inputArr);
+}
+
+window.addEventListener('load', function () {
+    // change comments to change the record :-)
+    // showAndPlay(cord);
+    showAndPlay(tune);
 });
