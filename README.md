@@ -5,9 +5,9 @@ notes into music music. Create music through live coding.
 
 # Inspiration
 
-* [Overtone]:(https://overtone.github.io/)
-* [SonicPi]:(https://sonic-pi.net/)
-* [Undertone]:(https://fable.io/repl/) "Samples" > "Fun and Games" > "Undertone - Programmable music"
+* [Overtone](https://overtone.github.io/)
+* [SonicPi](https://sonic-pi.net/)
+* [Undertone](https://fable.io/repl/) "Samples" > "Fun and Games" > "Undertone - Programmable music"
 
 # Sound Waves
 
