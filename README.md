@@ -7,7 +7,7 @@ notes into music music. Create music through live coding.
 
 * [Overtone](https://overtone.github.io/)
 * [SonicPi](https://sonic-pi.net/)
-* [Undertone](https://fable.io/repl/) "Samples" > "Fun and Games" > "Undertone - Programmable music"
+* [Undertone](https://fable.io/repl/) `"Samples"` > `"Fun and Games"` > `"Undertone - Programmable music"`
 
 # Sound Waves
 
@@ -57,7 +57,7 @@ To model sound we need to model the wave. The simplest way to do this is use a c
 
 To do this we first need to define a sample rate, which is the frequency at which samples will be collected / played back. The industry standard for this is 44,100Hz.
 
-Give the sample rate, each sample in the frequence represents the amplitude of the wave at a current time. The time is calculated implicitly from the period of the sample frequency.
+Each float in the collection is a sample, which represents the amplitude of the wave at a current time. The time is calculated implicitly from the period of the sample frequency.
 
 ![sound waves](img/signal-sampling.png)
 
@@ -85,9 +85,9 @@ There are two code folders:
 * [src/solution](src/solution)
 
 In `exercise` some infrastructure code has been put in place:
-* Help generate notes at certain frequencies
-* Transform and playback the note
-* Generate sequences of notes to play
+* Functions to generate notes at certain frequencies
+* Functions to transform and playback the note
+* Generate sequences of notes to play:
     - a simple nursery rhymes
     - a chord made of three notes
 
@@ -96,18 +96,18 @@ The folder `solution` contains a model solution that uses exercise as a starting
 The exercise consist of completing the below functions to be able play back the note sequences given at the end of the file.
 
 Wave generation functions:
-* sine - generates a sine wave from the phase angle
-* square - generates a square wave from the phase angle
-* triangle - generates a triangular wave from the phase angle
-* sawtooth  - generates a right angle triangle wave from the phase angle
+* `sine` - generates a sine wave from the phase angle
+* `square` - generates a square wave from the phase angle
+* `triangle` - generates a triangular wave from the phase angle
+* `sawtooth`  - generates a right angle triangle wave from the phase angle
 
 (See below for an explanation of phase angle)
 
 Transformation functions:
-* Transformation_scaleHeight - makes the amplitude of the wave larger or smaller
-* Transformation_flatten  - cuts the wave amplitude off at a certain hight
-* Transformation_tapper - applies a slope to the wave
-* Transformation_combine - combines two or more notes into a chord
+* `Transformation_scaleHeight` - makes the amplitude of the wave larger or smaller
+* `Transformation_flatten`  - cuts the wave amplitude off at a certain hight
+* `Transformation_tapper` - applies a slope to the wave
+* `Transformation_combine` - combines two or more notes into a chord
 
 ## Phase Angle
 
@@ -141,5 +141,6 @@ However, the options are quite limited so here are some more transformations / e
 * [Reverb](https://en.wikipedia.org/wiki/Reverberation)
 * [Flanging](https://en.wikipedia.org/wiki/Flanging)
 * [Low frequency oscillator](https://en.wikipedia.org/wiki/Low-frequency_oscillation)
+* Load and play back a sample
 
 Finally, if you ger board of this simple system, the libraries [Overtone](https://overtone.github.io/) and [SonicPi](https://sonic-pi.net/) have rich sound synthesis capabilities, so explore them and make some tunes.
