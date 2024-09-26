@@ -149,38 +149,28 @@ function makeNote(waveFunc, length, note, octave) {
  * function for making a sine wave
  */
 function sine(phaseAngle) {
-    return Math.sin((2 * 3.141592653589793) * phaseAngle);
+    return 0;
 }
 
 /**
  * function for making a square wave
  */
 function square(phaseAngle) {
-    if (phaseAngle < 0.5) {
-        return -1;
-    }
-    else {
-        return 1;
-    }
+    return 0;
 }
 
 /**
  * function for making triangular waves
  */
 function triangle(phaseAngle) {
-    if (phaseAngle < 0.5) {
-        return 2 * phaseAngle;
-    }
-    else {
-        return 1 - (2 * phaseAngle);
-    }
+    return 0;
 }
 
 /**
  * function for making right angle triangular waves
  */
 function sawtooth(phaseAngle) {
-    return -1 + phaseAngle;
+    return 0;
 }
 
 /* ************************************************************* */
@@ -188,38 +178,17 @@ function sawtooth(phaseAngle) {
 /* ************************************************************* */
 
 /**
- * Combines several notes into a chord
- */
-function Transformation_combine(its) {
-    const zip = (arr) => {
-        const length = Math.max(...arr.map(a => a.length));
-        return Array(length).fill().map((_,i) => arr.map(a => a[i]))
-    };
-    const arr = its.map(x => Array.from(x));
-    const zipped = zip(arr);
-    console.log(zipped.length);
-    const combined = zipped.map(x => {
-            var sum = 0;
-            for(const y of x) {
-                sum += y;
-            } 
-            return sum;
-    }); 
-    return combined;
-  };
-
-/**
  * makes the waves amplitude large or small by scaling by the given multiplier
  */
 function Transformation_scaleHeight(multiplier, waveDef) {
-    return waveDef.map((x) => (x * multiplier));
+    return waveDef.map((x) => x);
 }
 
 /**
  * flattens the wave at the given limit to give an overdrive effect
  */
 function Transformation_flatten(limit, waveDef) {
-    return waveDef.map((x) => Math.max(-limit, Math.min(x, limit)));
+    return waveDef.map((x) => x);
 }
 
 /**
@@ -229,10 +198,16 @@ function Transformation_flatten(limit, waveDef) {
  * interpolated between the two values
  */
 function Transformation_tapper(startMultiplier, endMultiplier, waveDef) {
-    const waveVector = Array.from(waveDef);
-    const step = (endMultiplier - startMultiplier) / waveVector.length;
-    return waveVector.map((x, i) => (x * (startMultiplier + (step * i))));
+    return waveDef.map((x, i) => x);
 }
+
+/**
+ * Combines several notes into a chord
+ */
+function Transformation_combine(its) {
+    return its.map((x, i) => 0.0);
+  };
+
 
 /* ************************************************************* */
 /* functions outputing a wave in the WAV format                  */
@@ -333,15 +308,6 @@ function Svg_displayWave(points) {
 /* Finally put it all together to make music!                    */
 /* ************************************************************* */
 
-
-const cord =
-    Transformation_flatten(0.9,
-        Transformation_combine([ 
-                Transformation_scaleHeight(0.3, makeNote(sine, noteValue(bpm, crotchet), C, 4)),
-                Transformation_scaleHeight(0.3, makeNote(square, noteValue(bpm, crotchet), G, 4)),
-                Transformation_scaleHeight(0.3, makeNote(sawtooth, noteValue(bpm, crotchet), A, 4)),
-                ]));
-
 const tune = 
     [ 
         //C C G G A A AA G
@@ -366,6 +332,15 @@ const tune =
         Transformation_tapper(0.9, 0.1, makeNote(sine, noteValue(bpm, crotchet), C, 4)) 
     ].flat();
 
+const cord =
+    Transformation_flatten(0.9,
+        Transformation_combine([ 
+                Transformation_scaleHeight(0.3, makeNote(sine, noteValue(bpm, crotchet), C, 4)),
+                Transformation_scaleHeight(0.3, makeNote(square, noteValue(bpm, crotchet), G, 4)),
+                Transformation_scaleHeight(0.3, makeNote(sawtooth, noteValue(bpm, crotchet), A, 4)),
+                ]));
+
+
 function showAndPlay(input) {
     var inputArr = Array.from(input);
     const wav = WaveFormat_wavOfBuffer(inputArr);
@@ -380,6 +355,6 @@ function showAndPlay(input) {
 
 window.addEventListener('load', function () {
     // change comments to change the record :-)
-    // showAndPlay(cord);
     showAndPlay(tune);
+    // showAndPlay(cord);
 });
