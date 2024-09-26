@@ -61,15 +61,85 @@ Give the sample rate, each sample in the frequence represents the amplitude of t
 
 ![sound waves](img/signal-sampling.png)
 
-
-## Generating a Note
-
-Once we know the sample rate, given the frequence of a note, we can calculate the rate of change change required to make an oscillation in the notes period.
-This is known as the phase angle.
-
-Once we've calculated the phase
+Source: [Sampling_(signal_processing](https://en.wikipedia.org/wiki/Sampling_(signal_processing))
 
 
 ## Playing Sound
 
+Playing back the sound has 4 phases:
+
+1. Generating the collection of floats that model the sound
+1. Converting the collection of floats to WAV format
+1. Convert the WAV to a base64 string
+1. Pass the base64 string to a browser audio control for playback.
+
+![sound playback](img/playback.png)
+
 # The Exercise 
+
+The exercise will concentrate how how to generate and transform sound waves.
+
+There are two code folders:
+
+* [src/exercise](src/exercise)
+* [src/solution](src/solution)
+
+In `exercise` some infrastructure code has been put in place:
+* Help generate notes at certain frequencies
+* Transform and playback the note
+* Generate sequences of notes to play
+    - a simple nursery rhymes
+    - a chord made of three notes
+
+The folder `solution` contains a model solution that uses exercise as a starting point.
+
+The exercise consist of completing the below functions to be able play back the note sequences given at the end of the file.
+
+Wave generation functions:
+* sine - generates a sine wave from the phase angle
+* square - generates a square wave from the phase angle
+* triangle - generates a triangular wave from the phase angle
+* sawtooth  - generates a right angle triangle wave from the phase angle
+
+(See below for an explanation of phase angle)
+
+Transformation functions:
+* Transformation_scaleHeight - makes the amplitude of the wave larger or smaller
+* Transformation_flatten  - cuts the wave amplitude off at a certain hight
+* Transformation_tapper - applies a slope to the wave
+* Transformation_combine - combines two or more notes into a chord
+
+## Phase Angle
+
+Once we know the sample rate, given the frequence of a note, we can calculate the rate of change change required to make an oscillation in the notes period.
+This is known as the phase angle.
+
+There's an infrastructure that will calculate the phase angle for us:
+
+```
+/**
+ * make a wave using the given function, length and frequency
+ */
+function makeWave(waveFunc, length, frequency) {
+    ...
+}
+```
+
+In the `makeWave` function the parameters `length`, in samples, and `frequency` frequency, in hertz are used to calculate the phase or rate of change. The phase angle is then passed to the parameter `waveFunc`, which is the used to generate the relevant sequence of samples.
+
+**Note:** you generally won't use the `makeWave` function directly, there's a wrapper `makeNote` which takes frequency in terms of `note` and `octave` instead of hertz.
+
+# Going Further
+
+If you complete the exercise and want to do more, there's a lot more you can do!
+
+First of all, try and make some interesting music using the existing facilities.
+
+However, the options are quite limited so here are some more transformations / effects you could implement:
+
+* Echo
+* [Reverb](https://en.wikipedia.org/wiki/Reverberation)
+* [Flanging](https://en.wikipedia.org/wiki/Flanging)
+* [Low frequency oscillator](https://en.wikipedia.org/wiki/Low-frequency_oscillation)
+
+Finally, if you ger board of this simple system, the libraries [Overtone](https://overtone.github.io/) and [SonicPi](https://sonic-pi.net/) have rich sound synthesis capabilities, so explore them and make some tunes.
