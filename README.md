@@ -137,10 +137,11 @@ First of all, try and make some interesting music using the existing facilities.
 
 However, the options are quite limited so here are some more transformations / effects you could implement:
 
+* Load a sample
+* Speed up / slow down a sample frequency
 * Echo
 * [Reverb](https://en.wikipedia.org/wiki/Reverberation)
 * [Flanging](https://en.wikipedia.org/wiki/Flanging)
 * [Low frequency oscillator](https://en.wikipedia.org/wiki/Low-frequency_oscillation)
-* Load and play back a sample
 
 Finally, if you ger board of this simple system, the libraries [Overtone](https://overtone.github.io/) and [SonicPi](https://sonic-pi.net/) have rich sound synthesis capabilities, so explore them and make some tunes!
