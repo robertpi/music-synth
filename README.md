@@ -53,6 +53,22 @@ Notes uneven distributed semitones aren’t.
 
 ## Modeling Sound
 
+To model sound we need to model the wave. The simplest way to do this is use a collection of floats with values between 1.0 and -1.0 representing the amplitude of the wave.
+
+To do this we first need to define a sample rate, which is the frequency at which samples will be collected / played back. The industry standard for this is 44,100Hz.
+
+Give the sample rate, each sample in the frequence represents the amplitude of the wave at a current time. The time is calculated implicitly from the period of the sample frequency.
+
+![sound waves](img/signal-sampling.png)
+
+
+## Generating a Note
+
+Once we know the sample rate, given the frequence of a note, we can calculate the rate of change change required to make an oscillation in the notes period.
+This is known as the phase angle.
+
+Once we've calculated the phase
+
 
 ## Playing Sound
 
