@@ -143,4 +143,4 @@ However, the options are quite limited so here are some more transformations / e
 * [Low frequency oscillator](https://en.wikipedia.org/wiki/Low-frequency_oscillation)
 * Load and play back a sample
 
-Finally, if you ger board of this simple system, the libraries [Overtone](https://overtone.github.io/) and [SonicPi](https://sonic-pi.net/) have rich sound synthesis capabilities, so explore them and make some tunes.
+Finally, if you ger board of this simple system, the libraries [Overtone](https://overtone.github.io/) and [SonicPi](https://sonic-pi.net/) have rich sound synthesis capabilities, so explore them and make some tunes!
